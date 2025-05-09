@@ -1,0 +1,39 @@
+@page "/"
+@inject HttpClient Http
+
+<h3>Subtext Matcher</h3>
+
+<div>
+    <label>Text:</label>
+    <textarea @bind="text" rows="4" cols="50"></textarea>
+</div>
+<div>
+    <label>Subtext:</label>
+    <input @bind="subtext" />
+</div>
+<div>
+    <button @onclick="FindMatches">Match</button>
+</div>
+
+@if (matches != null)
+{
+    <p>Match Positions: @(matches.Count == 0 ? "No match found" : string.Join(", ", matches))</p>
+}
+
+@code {
+    private string text;
+    private string subtext;
+    private List<int> matches;
+
+    private async Task FindMatches()
+    {
+        var request = new
+        {
+            Text = text,
+            Subtext = subtext
+        };
+
+        var response = await Http.PostAsJsonAsync("api/match", request);
+        matches = await response.Content.ReadFromJsonAsync<List<int>>();
+    }
+}
